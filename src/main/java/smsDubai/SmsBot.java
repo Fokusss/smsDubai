@@ -16,7 +16,7 @@ import java.util.*;
 
 public class SmsBot extends TelegramLongPollingBot {
 
-  private final String botToken = "7799926385:AAGptgE3qz3yXCGOA2tKUe-CXRmpX9R_WKE";
+  private final String botToken = "7799926385:AAE5D_vzKB97B31IXrW05xaCFA2UMeVk984";
   private final String botUsername = "smsDubai_bot";
   private final Map<Long, List<String[]>> userData = new HashMap<>();
 
@@ -37,6 +37,7 @@ public class SmsBot extends TelegramLongPollingBot {
 
     if (message.hasDocument()) {
       Document doc = message.getDocument();
+      System.out.println(message.getChatId() + " send .csv");
       if (doc.getFileName().endsWith(".csv")) {
         try {
           GetFile getFile = new GetFile(doc.getFileId());
@@ -49,7 +50,33 @@ public class SmsBot extends TelegramLongPollingBot {
           List<String[]> data = new ArrayList<>();
           String line;
           while ((line = reader.readLine()) != null) {
-            data.add(line.split(","));
+            String str = "";
+            boolean isOpt = false;
+            String[] newMas = new String[120];
+            int countI = 0;
+            for (char item : line.toCharArray()) {
+              if (item == '"' && !isOpt) {
+                isOpt = true;
+                continue;
+              } else if (item == '"' && isOpt) {
+                isOpt = false;
+                str += item;
+                continue;
+              }
+              if (item == ',' && !isOpt) {
+                newMas[countI] = str;
+                countI += 1;
+                str = "";
+              } else {
+                str += item;
+              }
+            }
+
+            newMas[countI] = str;
+            countI +=1;
+
+            data.add(newMas);
+
           }
 
           userData.put(chatId, data);
@@ -62,9 +89,10 @@ public class SmsBot extends TelegramLongPollingBot {
     } else if (message.hasText() && userData.get(message.getChatId()) != null) {
       String day = message.getText();
       int dayInt;
+      System.out.println(message.getChatId() + " send " + message.getText());
       try {
         dayInt = Integer.parseInt(day);
-        sendMessage(message.getChatId(), "Обработка файла");
+        //sendMessage(message.getChatId(), "Обработка файла");
         Processing processing = new Processing(userData.get(message.getChatId()), dayInt);
         sendMessage(message.getChatId(), processing.printUpdate());
       } catch (Exception e) {
