@@ -16,7 +16,7 @@ import java.util.*;
 
 public class SmsBot extends TelegramLongPollingBot {
 
-  private final String botToken = "7799926385:AAE5D_vzKB97B31IXrW05xaCFA2UMeVk984";
+  private final String botToken =
   private final String botUsername = "smsDubai_bot";
   private final Map<Long, List<String[]>> userData = new HashMap<>();
 
