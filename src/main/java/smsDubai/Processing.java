@@ -29,9 +29,9 @@ public class Processing {
   public String printUpdate() {
     String str = "Good evening \uD83C\uDF0C \n \n" +
             "OM/Shvili/RC\n";
-    /*System.out.println(Arrays.toString(data));
+    System.out.println(Arrays.toString(data));
     System.out.println(Arrays.toString(firstLane));
-    System.out.println(Arrays.toString(lastLane));*/
+    System.out.println(Arrays.toString(lastLane));
     str += printDate();
     str += "\n";
     str += "Daytime:\n";
@@ -51,25 +51,25 @@ public class Processing {
     str += "Qlab payment: " + categoriesPrint(this.data[73], this.data[74], this.data[75]);
     str += "\n";
     str += "For Restaurant Combo:\n";
-    str += "Food revenue: " + this.data[76] + this.aedPref + "\n";
-    str += "Shvili: " + this.data[77] + this.aedPref + " / " + formatterProc(this.data[86], "#") + "\n";
-    str += "OM: " + this.data[78] + this.aedPref + " / " + formatterProc(this.data[85], "#") + "\n";
+    str += "Food revenue: " + formatterValue(this.data[76],this.aedPref) + "\n";
+    str += "Shvili: " + formatterValue(this.data[77], this.aedPref) + " / " + formatterProc(this.data[86], "#") + "\n";
+    str += "OM: " + formatterValue(this.data[78], this.aedPref) + " / " + formatterProc(this.data[85], "#") + "\n";
     str += "\n";
     str += "Finance:\n";
-    str += "Average check: " + this.data[31] + this.aedPref + " / " + this.data[32] + this.ruPref+ "\n";
-    str += "Average check per guest: " + this.data[33] + this.aedPref + " / " + this.data[34] + this.ruPref+ "\n";
+    str += "Average check: " + formatterValue(this.data[31], this.aedPref) + " / " + formatterValue(this.data[32], this.ruPref) + "\n";
+    str += "Average check per guest: " + formatterValue(this.data[33], this.aedPref) + " / " + formatterValue(this.data[34],this.ruPref) + "\n";
     str += "\n";
     str += "SSS:\n";
     str += "SSS DAY (2024): " + formatterProc(this.data[38], "#") + "\n";
     str += "SSS WEEK (2024): " + formatterProc(this.data[39], "#") + "\n";
-    str += "SSS MONTH  (2024): " + formatterProc(this.data[40], "#") + "\n";
+    str += "SSS MONTH (2024): " + formatterProc(this.data[40], "#") + "\n";
     str += "\n";
     str += "Delta BC: " + formatterProc(this.data[41], "#") + "\n";
     str += "\n";
-    str += "Plan vs forecast for the end of the month: " + this.firstLane[6] + "/ " + this.lastLane[35] + " / " + formatterProc(this.lastLane[37], "#") + "\n";
+    System.out.println(this.firstLane[37] + " " + this.firstLane[38]);
+    str += "Plan vs forecast for the end of the month: " + formatterValue(this.firstLane[6]) + " / " + formatterValue(this.firstLane[37]) + " / " + formatterProc(this.firstLane[38], "#") + "\n";
     str += "\n";
     str += "Best regards, ";
-
     return str.substring(0, Math.min(str.length(), 4000));
   }
 
@@ -81,7 +81,7 @@ public class Processing {
             "июл", "авг", "сент", "окт", "нояб", "дек", ""
     });
     String dayMonthYear = this.data[2].replace(".", "").trim();
-    SimpleDateFormat parser = new SimpleDateFormat("dd MMM yy", dfs);
+    SimpleDateFormat parser = new SimpleDateFormat("d MMM yy", Locale.ENGLISH);
     SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
     SimpleDateFormat dateWeek = new SimpleDateFormat("EEEE", Locale.ENGLISH);
     try {
@@ -98,16 +98,20 @@ public class Processing {
     value = value.replaceAll("[\\s\\u00A0\\u2007\\u202F]", "");
     value = value.replaceAll("%", "");
     value = value.replaceAll("\\u0022", "");
-    value = value.replace(",", ".");
+    //value = value.replace(",", ".");
     return value;
   }
 
   private String formatterValue(String value, String pref) {
+    if (value == "") {
+      value = "0";
+    }
     value = afterSimbol(value);
     DecimalFormatSymbols symbols = new DecimalFormatSymbols(Locale.ENGLISH);
     symbols.setGroupingSeparator(' ');
     DecimalFormat decimalFormat = new DecimalFormat("#,###", symbols);
-    return decimalFormat.format(Integer.parseInt(value)) + pref;
+    //System.out.println(value);
+    return decimalFormat.format(Integer.parseInt(value.replaceAll(",", ""))) + pref;
   }
 
   private String formatterValue(String value) {
@@ -115,6 +119,9 @@ public class Processing {
   }
 
   private String formatterProc(String value, String pattern) {
+    if (value == "") {
+      value = "0";
+    }
     DecimalFormat decimalFormat = new DecimalFormat("#." + pattern);
     //System.out.println("v1" + value);
     value = afterSimbol(value);

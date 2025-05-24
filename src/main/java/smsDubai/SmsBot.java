@@ -37,7 +37,7 @@ public class SmsBot extends TelegramLongPollingBot {
 
     if (message.hasDocument()) {
       Document doc = message.getDocument();
-      System.out.println(message.getChatId() + " send .csv");
+      System.out.println(message.getChatId() + " send " + message.getDocument().getFileName());
       if (doc.getFileName().endsWith(".csv")) {
         try {
           GetFile getFile = new GetFile(doc.getFileId());
@@ -60,7 +60,7 @@ public class SmsBot extends TelegramLongPollingBot {
                 continue;
               } else if (item == '"' && isOpt) {
                 isOpt = false;
-                str += item;
+                //str += item;
                 continue;
               }
               if (item == ',' && !isOpt) {
